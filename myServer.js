@@ -112,4 +112,3 @@ app.use((req,res,next)=>{
 app.use(function(req,res){
     res.status(404).send("File not found")
 })
-app.listen(port)
