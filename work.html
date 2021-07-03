@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="lessons.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"/>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
+    <title>Lesson 01</title>
+</head>
+
+<body>
+    <body>
+        <div id="root">
+            <header>
+                <!-- text to center -->
+                <h1 v-text="sitename" class="text-center"></h1>
+                <button v-on:click='showCheckout'  v-show=" cartItemCount > 0" v-if="buttonvalue()" >
+                     {{cartItemCount}}
+    
+                    <span class="fas fa-cart-plus"></span> Checkout
+                    
+                </button>
+               <div style="display: flex; flex-wrap: wrap; " >
+                <div v-for="lesson in cart2" v-show="showCartItems" >
+                     <h3 v-text="lesson.title"></h3>
+                    <figure>
+                        <img v-bind:src="lesson.image" height="100" width="100">
+                    </figure>
+                    <p>Description:{{lesson.description}}</p>
+                    <p>Location:{{lesson.location}}</p>
+                    <p>Price:$ {{lesson.price}}</p>
+                    <p>Spaces: only {{lesson.availableInventory - cartCount(lesson.id)}} are left!</p>
+                    <button v-on:click='removeproduct(lesson)' v-if='canAddToCart(lesson)'>Remove from cart</button> 
+    
+    
+                    <button disabled="disable" v-else></button>
+                    </div>
+    
+                </div> 
+    
+    
+            </header>
+            <main>
+    
+                <div v-if='showLesson'>
+                    <table>
+                        <td><b>Sort by::</b></td>
+    
+                        <tr>
+                            <td> <input type="radio" name="a"
+                                        v-on:click="sortedsubject(lessons.title)">
+                                        Subject
+                            </td>
+                        <tr>
+                            <td><input type="radio" name="a"
+                                        v-on:click="sortedprice(lessons.price)">
+                                        Price
+                            </td>
+                        </tr>
+    
+                        <tr>
+                            <td><input type="radio" name="a"
+                                        v-on:click="sortedinventory(lessons.availableInventory)">
+                                        Availability
+                                    </td>
+                        </tr>
+                        <tr>
+                            <td><input type="radio" name="a"
+                                        v-on:click="sortedlocation(lessons.location)">
+                                        Location
+                                    </td>
+                        </tr>
+    
+                    </table>
+                    <div>
+                        <br>
+                        <table>
+                            <tr>
+                                <td><input type="radio" name="b"
+                                    v-on:click="sortingasn(lessons.title)">
+                                    Ascending
+                        </td>
+                               
+                            </tr>
+                            <tr>
+                                <td><input type="radio" name="b"
+                                    v-on:click="sortingdesn(lessons.title)">
+                                    Descending
+                        </td>
+                            </tr>
+                        </table>
+                    </div>
+
+    
+                     <div style="display: flex; flex-wrap: wrap;">
+                    <div v-for="lesson in lessons" >
+                      <img v-bind:src="lesson.image" height="300" width="300" >
+                      <div class="card-body"></div>
+                       <h2 v-text="lesson.title"class="card-title" ></h2>
+                        <p>Description: {{lesson.description}}</p>
+                        <p class="card-text" >Location:{{lesson.location}}</p>
+                        <p class="card-text">Price: $ {{lesson.price}}</p>
+                        <p class="card-text">Spaces:  {{lesson.availableInventory - cartCount(lesson.id)}} available!</p>
+    
+    
+                        <button  class="btn btn-primary" @click="display = true" v-on:click='addToCart(lesson)' v-if='canAddToCart(lesson)'>Add
+                            to cart</button>
+    
+                        <button v-else>Add to cart</button>
+    
+                      </div>
+                     </div>
+                    
+                </div>
+                <div v-else>
+                    <h2 style="text-align: center;">Checkout</h2>
+                    <p>
+                        <b>First Name:</b>
+                        <input v-model="order.firstName" placeholder="ENTER YOUR FIRST NAME!" required />
+                    </p>
+                    <p>
+                        <b>Last Name:</b>
+                        <input v-model="order.lastName" placeholder="ENTER YOUR LAST NAME!" />
+                    </p>
+                   
+
+                
+                    <p>
+                        <b>Phone:</b>
+                        <input type ="number"  v-model="order.phone" placeholder="ENTER UR PHONE NUMBER!" />
+                    </p>
+    
+    
+    
+                    <h2>Order Information</h2>
+                   
+                   <p>First Name: {{order.firstName}}</p>
+                    
+                    <p>Last Name: {{order.lastName}}</p>
+                
+                    <p>Phone number: {{order.phone}}</p>
+    
+                    <button v-on:click="submitForm">Place Order</button>
+                </div>
+            </main>
+        </div>
+    
+        </div>
+        <script type="text/javascript">
+            var myLesson = new Vue({
+                el: '#root',
+                data: {
+    
+                    sitename: 'Welcome to Fatima paradise .',
+                    lessons: myArr,
+    
+                    display: false,
+                    
+                    cart: [],
+                    cart2: [],
+                    showLesson: true,
+                    showCartItems:false,
+    
+                    order: {
+                        firstName: '',
+                        lastName: '',
+                        phone: '',
+                       
+                    },
+
+                    orderInfo:{}
+    
+
+                },
+
+                created:function(){
+                    fetch('https://salehsnode.herokuapp.com/collection/lessonInfo').then(
+                        function(response){
+                            response.json().then(
+                                function(json){
+                                    myLesson.orderInfo = json;
+                                }
+                            )
+                        }
+                    )
+
+                },
+                methods: {
+                    addToCart(lesson) {
+                        this.cart.push(lesson.id);
+                        this.cart2.push(lesson);
+    
+    
+    
+                    },
+    
+    
+                    sortedsubject() {
+                        function compare(x, y) {
+                            if (x.title > y.title)
+                                return 1;
+                           else{
+                               return -1;
+                           }
+                        
+    
+    
+                        }
+                        return this.lessons.sort(compare);
+    
+                    },
+
+                    sortedinventory() {
+                        function compare(x, y) {
+                            if (x.availableInventory > y.availableInventory)
+                                return 1;
+                            else{
+                                return -1;
+                            }
+    
+    
+                        }
+                        return this.lessons.sort(compare);
+    
+                    },
+                    sortedlocation() {
+                        function compare(x, y) {
+                            if (x.location > y.location)
+                                return 1;
+                           else{
+                               return -1;
+                           }
+    
+    
+                        }
+                        return this.lessons.sort(compare);
+    
+                    },
+    
+                    sortedprice() {
+                        function compare(x, y) {
+                            if (x.price > y.price)
+                                return 1;
+                            else{
+                                return -1
+                            };
+    
+                        }
+                        return this.lessons.sort(compare);
+    
+                    },
+                    sortingasn() {
+                        function compare(a, b) {
+                            if (a.title > b.title)
+                                return 1;
+                           else{
+                               return -1;
+                           }
+    
+    
+                        }
+                        return this.lessons.sort(compare);
+    
+                    },
+
+
+                    sortingdesn() {
+                        function compare(a, b) {
+                            if (a.title < b.title)
+                                return 1;
+                           else{
+                               return -1
+                           }
+    
+    
+                        }
+                        return this.lessons.sort(compare);
+    
+                    },
+                   
+    
+    
+                    showCheckout() {
+                        this.showLesson = this.showLesson ? false : true;
+                        this.showCartItems=this.showCartItems ? false:true;
+                        
+    
+                    },
+    
+    
+                    submitForm(l, b, c) {
+                        if (this.order.firstName == "" && this.order.lastName == "" && this.order.phone == "") {
+    
+                             alert('PLEASE ENTER YOUR DETAILS FOR ORDERS')
+    
+                        }
+                        if (this.order.firstName == "") {
+                             alert('PLEASE ENTER YOUR NAME')
+                        }
+                        if (this.order.lastName == "") {
+                            return alert('PLEASE ENTER YOU LASTNAME')
+                        }
+                        if (this.order.phone == "") {
+                            return alert('PLEASE ENTER YOUR MOBILE NUM OR PHONE', { background: 'black' });
+                        }
+                        else {
+    
+    
+                            this.order.firstName = "";
+                            this.order.lastName = "";
+                            this.order.phone = "";
+    
+                            return alert(' you are succesfully placed the order')
+    
+    
+                        }
+    
+                    },
+                    submitForm(){
+                    // this.cart.array.forEach(element => {
+                        
+            //         // });
+            //         fetch('https://salehsnode.herokuapp.com/collection/lessonInfo', {
+
+            //             method: 'PUT',
+
+            //             headers: {
+
+            //                 'Content-Type': 'application/json',
+            //             },
+            //             body: JSON.stringify({ availableInventory: element.availelementableInventory })}).then(function (data) {
+
+            // }),
+            alert(" Succesfuly added");
+            
+            fetch('https://salehsnode.herokuapp.com/collection/orderInfo', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ Name: this.order.firstName, Phone: this.order.phone, ProductsInOrder: this.cart.map(({ title }) => title) })}).then(function () {
+                        }   
+                        
+                        )},                     
+
+
+                
+
+                    
+                    canAddToCart(lesson) {
+                        return lesson.availableInventory > this.cartCount(lesson.id);
+                    },
+                    cartCount(id) {
+    
+                        let count = 0;
+                        for (let i = 0; i < this.cart.length; i++) {
+                            if (this.cart[i] === id) {
+                                count++;
+    
+    
+                            }
+                        }
+                        return count;
+    
+    
+                    },
+    
+                    buttonvalue() {
+                        if (this.cart.length > 0) {
+                            return true;
+                        } else {
+    
+                            return false;
+    
+                        }
+                    },
+                    removeproductfrominve()
+                    {
+                        if(this.cart.length <= 0)
+                        {
+                            return true;
+                        }
+                        else{
+                            false;
+                        }
+    
+    
+                    },
+    
+    
+    
+                    removeproduct(lesson) {
+                        this.cart2.pop(lesson);
+                        this.cart.pop(lesson);
+    
+                    }
+                },
+                computed: {
+                    cartItemCount() {
+    
+                        return this.cart.length;
+                    }
+                },
+    
+    
+    
+            });
+    
+    
+        </script>
+</body>
+</html>
